@@ -10,7 +10,8 @@ public class GameManagerX : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI gameOverText;
     public GameObject titleScreen;
-    public Button restartButton; 
+    public Button restartButton;
+    public TextMeshProUGUI  timerText; 
 
     public List<GameObject> targetPrefabs;
 
@@ -21,16 +22,19 @@ public class GameManagerX : MonoBehaviour
     private float spaceBetweenSquares = 2.5f; 
     private float minValueX = -3.75f; //  x value of the center of the left-most square
     private float minValueY = -3.75f; //  y value of the center of the bottom-most square
+
+    public float timeLeft;
     
     // Start the game, remove title screen, reset score, and adjust spawnRate based on difficulty button clicked
-    public void StartGame()
+    public void StartGame(int difficulty)
     {
-        spawnRate /= 5;
+        spawnRate /= difficulty;
         isGameActive = true;
         StartCoroutine(SpawnTarget());
         score = 0;
         UpdateScore(0);
         titleScreen.SetActive(false);
+        timeLeft = 60;
     }
 
     // While game is active spawn a random target
@@ -77,7 +81,7 @@ public class GameManagerX : MonoBehaviour
     public void GameOver()
     {
         gameOverText.gameObject.SetActive(true);
-        restartButton.gameObject.SetActive(false);
+        restartButton.gameObject.SetActive(true);
         isGameActive = false;
     }
 
@@ -87,4 +91,16 @@ public class GameManagerX : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    private void update(){
+
+        if(isGameActive){
+            timeLeft -= Time.deltaTime;
+            timerText.SetText("Time: " + Mathf.Round(timeLeft));
+
+            if(timeLeft < 0){
+                GameOver();
+            }
+
+        }
+    }
 }
